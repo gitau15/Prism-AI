@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Upgrade to Pro - Prism AI{% endblock %}
+
+{% block content %}
+<div class="card">
+    <header>
+        <h1>Upgrade to Pro</h1>
+        <p>Unlock unlimited document processing and queries</p>
+    </header>
+    
+    {% if message %}
+    <div class="alert alert-success">
+        <p>{{ message }}</p>
+    </div>
+    {% endif %}
+    
+    {% if error %}
+    <div class="alert alert-danger">
+        <p>{{ error }}</p>
+    </div>
+    {% endif %}
+    
+    <section>
+        <h2>Pro Plan Features</h2>
+        <ul>
+            <li>Unlimited document processing</li>
+            <li>Unlimited queries</li>
+            <li>Priority processing</li>
+            <li>Advanced analytics</li>
+            <li>Early access to new features</li>
+        </ul>
+        
+        <p><strong>Price:</strong> KSh 999/month</p>
+    </section>
+    
+    <section>
+        <h2>Complete Your Purchase</h2>
+        <form action="/upgrade" method="post">
+            <div>
+                <label for="phone_number">M-Pesa Phone Number</label>
+                <input type="tel" id="phone_number" name="phone_number" placeholder="e.g., 254712345678" required>
+            </div>
+            
+            <button type="submit">Pay with M-Pesa</button>
+        </form>
+    </section>
+</div>
+
+<div id="loadingIndicator" class="loading" style="display: none;">
+    <div class="spinner"></div>
+    <p>Processing your payment request... Please check your phone for the M-Pesa prompt.</p>
+</div>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Prism AI{% endblock %}
+
+{% block content %}
+<header>
+    <h1>Welcome back, {{ user.email }}!</h1>
+    <p>Your Prism AI Dashboard</p>
+</header>
+
+<section class="stats-grid">
+    <div class="stat-card">
+        <h3>Pages Processed</h3>
+        <div class="stat-number">{{ user.pages_processed_this_month }}</div>
+        <p>of {{ user.pages_limit }} this month</p>
+        <div class="progress-bar">
+            <div class="progress-fill {{ user.pages_progress_class }}"></div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <h3>Queries Used</h3>
+        <div class="stat-number">{{ user.queries_this_month }}</div>
+        <p>of {{ user.queries_limit }} this month</p>
+        <div class="progress-bar">
+            <div class="progress-fill {{ user.queries_progress_class }}"></div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <h3>Subscription</h3>
+        <div class="stat-number">{{ user.subscription_tier }}</div>
+        <p>{% if user.subscription_tier == "EXPLORER" %}Free tier{% else %}Pro tier{% endif %}</p>
+    </div>
+</section>
+
+{% if user.subscription_tier == "EXPLORER" %}
+<section class="card" style="background-color: var(--lightest-blue); text-align: center;">
+    <h2>Unlock Unlimited Power</h2>
+    <p>Upgrade to Pro for unlimited document processing and queries</p>
+    <a href="/upgrade" role="button" class="contrast">Upgrade to Pro</a>
+</section>
+{% endif %}
+
+<section>
+    <h2>Get Started</h2>
+    <div class="grid">
+        <a href="/documents" role="button">Manage Documents</a>
+        <a href="/query" role="button">Ask Prism</a>
+    </div>
+</section>
+{% endblock %}

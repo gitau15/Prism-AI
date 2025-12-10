@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Ask Prism - Prism AI{% endblock %}
+
+{% block content %}
+<div class="query-container">
+    <div class="query-input">
+        <header>
+            <h1>Ask Prism AI</h1>
+            <p>Ask questions about your documents</p>
+        </header>
+        
+        <form action="/query" method="post" id="queryForm">
+            <div>
+                <label for="question">What would you like to know?</label>
+                <textarea id="question" name="question" class="query-textarea" placeholder="e.g., What are the key findings in my research paper?" required>{{ question or '' }}</textarea>
+            </div>
+            
+            <button type="submit">Ask Prism</button>
+        </form>
+    </div>
+    
+    <div class="query-answer">
+        {% if answer %}
+        <h2>Answer</h2>
+        <article>
+            <p>{{ answer.response }}</p>
+            
+            {% if answer.sources %}
+            <hr>
+            <details>
+                <summary>Sources</summary>
+                <ul>
+                    {% for source in answer.sources %}
+                    <li>{{ source }}</li>
+                    {% endfor %}
+                </ul>
+            </details>
+            {% endif %}
+        </article>
+        {% else %}
+        <div class="answer-placeholder">
+            <p>Your answer will appear here.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div id="loadingIndicator" class="loading" style="display: none;">
+    <div class="spinner"></div>
+    <p>Thinking... This may take a moment.</p>
+</div>
+{% endblock %}

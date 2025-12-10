@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prism AI Feedback Widget</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .feedback-container {
+            max-width: 500px;
+            margin: 50px auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        
+        h1 {
+            color: #2563eb;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #6b7280;
+            margin-bottom: 30px;
+        }
+        
+        .rating-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+        
+        .rating-star {
+            font-size: 32px;
+            color: #d1d5db;
+            cursor: pointer;
+            transition: color 0.2s;
+            margin: 0 5px;
+        }
+        
+        .rating-star.selected {
+            color: #fbbf24;
+        }
+        
+        .rating-star:hover {
+            color: #fbbf24;
+        }
+        
+        textarea, input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-family: inherit;
+            resize: vertical;
+        }
+        
+        textarea:focus, input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        .button {
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            width: 100%;
+            transition: background-color 0.2s;
+        }
+        
+        .button:hover {
+            background-color: #1d4ed8;
+        }
+        
+        .success-message {
+            background-color: #10b981;
+            color: white;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .error-message {
+            background-color: #ef4444;
+            color: white;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="feedback-container">
+        <h1>We Value Your Feedback</h1>
+        <p class="subtitle">Help us improve Prism AI with your suggestions</p>
+        
+        <form id="feedback-form">
+            <div class="rating-container">
+                <span class="rating-star" data-rating="1">★</span>
+                <span class="rating-star" data-rating="2">★</span>
+                <span class="rating-star" data-rating="3">★</span>
+                <span class="rating-star" data-rating="4">★</span>
+                <span class="rating-star" data-rating="5">★</span>
+            </div>
+            
+            <input type="hidden" id="rating" name="rating" value="0">
+            
+            <label for="comment">General Feedback</label>
+            <textarea id="comment" name="comment" rows="3" placeholder="What do you like or dislike about Prism AI?"></textarea>
+            
+            <label for="feature_request">Feature Requests</label>
+            <textarea id="feature_request" name="feature_request" rows="2" placeholder="What features would you like to see?"></textarea>
+            
+            <label for="bug_report">Bug Reports</label>
+            <textarea id="bug_report" name="bug_report" rows="2" placeholder="Describe any issues you've encountered"></textarea>
+            
+            <button type="submit" class="button">Submit Feedback</button>
+        </form>
+        
+        <div id="success-message" class="success-message">
+            Thank you for your feedback! We appreciate your input.
+        </div>
+        
+        <div id="error-message" class="error-message">
+            Sorry, there was an error submitting your feedback. Please try again.
+        </div>
+    </div>
+
+    <script>
+        // Handle star ratings
+        const stars = document.querySelectorAll('.rating-star');
+        const ratingInput = document.getElementById('rating');
+        
+        stars.forEach(star => {
+            star.addEventListener('click', () => {
+                const rating = star.getAttribute('data-rating');
+                ratingInput.value = rating;
+                
+                // Update star appearance
+                stars.forEach((s, index) => {
+                    if (index < rating) {
+                        s.classList.add('selected');
+                    } else {
+                        s.classList.remove('selected');
+                    }
+                });
+            });
+        });
+        
+        // Handle form submission
+        document.getElementById('feedback-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Hide previous messages
+            document.getElementById('success-message').style.display = 'none';
+            document.getElementById('error-message').style.display = 'none';
+            
+            // Get form data
+            const formData = {
+                rating: parseInt(document.getElementById('rating').value),
+                comment: document.getElementById('comment').value || null,
+                feature_request: document.getElementById('feature_request').value || null,
+                bug_report: document.getElementById('bug_report').value || null
+            };
+            
+            // Remove empty fields
+            Object.keys(formData).forEach(key => {
+                if (formData[key] === null || formData[key] === '') {
+                    delete formData[key];
+                }
+            });
+            
+            try {
+                // Submit feedback to API
+                const response = await fetch('http://localhost:8000/api/v1/feedback/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                if (response.ok) {
+                    // Show success message
+                    document.getElementById('success-message').style.display = 'block';
+                    
+                    // Reset form
+                    document.getElementById('feedback-form').reset();
+                    ratingInput.value = '0';
+                    stars.forEach(star => star.classList.remove('selected'));
+                } else {
+                    throw new Error('Failed to submit feedback');
+                }
+            } catch (error) {
+                // Show error message
+                document.getElementById('error-message').style.display = 'block';
+                console.error('Error submitting feedback:', error);
+            }
+        });
+    </script>
+</body>
+</html>

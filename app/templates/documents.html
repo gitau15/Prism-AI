@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Documents - Prism AI{% endblock %}
+
+{% block content %}
+<header>
+    <h1>My Documents</h1>
+    <p>Manage and process your documents</p>
+</header>
+
+{% if message %}
+<div class="alert alert-success">
+    <p>{{ message }}</p>
+</div>
+{% endif %}
+
+{% if error %}
+<div class="alert alert-danger">
+    <p>{{ error }}</p>
+</div>
+{% endif %}
+
+<section class="upload-area">
+    <h2>Upload New Document</h2>
+    <form action="/documents" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" required>
+        <button type="submit">Upload Document</button>
+    </form>
+</section>
+
+<section>
+    <h2>Your Documents</h2>
+    {% if documents %}
+    <table>
+        <thead>
+            <tr>
+                <th>Filename</th>
+                <th>Type</th>
+                <th>Size</th>
+                <th>Status</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for document in documents %}
+            <tr>
+                <td>{{ document.filename }}</td>
+                <td>{{ document.file_type }}</td>
+                <td>{{ document.size }} bytes</td>
+                <td>
+                    {% if document.processed %}
+                        <span class="badge badge-ready">Ready</span>
+                    {% else %}
+                        <span class="badge badge-processing">Processing</span>
+                    {% endif %}
+                </td>
+                <td>{{ document.created_at.strftime("%Y-%m-%d %H:%M") if document.created_at else "N/A" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>You haven't uploaded any documents yet.</p>
+    {% endif %}
+</section>
+
+<div id="loadingIndicator" class="loading" style="display: none;">
+    <div class="spinner"></div>
+    <p>Processing your document... This may take a moment.</p>
+</div>
+{% endblock %}
