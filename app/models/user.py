@@ -1,6 +1,12 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, Date, Enum
 from sqlalchemy.sql import func
 from app.database.base import Base
+import enum
+from datetime import date
+
+class SubscriptionTier(str, enum.Enum):
+    EXPLORER = "EXPLORER"
+    PRO = "PRO"
 
 class User(Base):
     __tablename__ = "users"
@@ -12,4 +18,8 @@ class User(Base):
     is_superuser = Column(Boolean, default=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
-    # Relationship fields would be added here
+    # Usage tracking fields
+    subscription_tier = Column(Enum(SubscriptionTier), default=SubscriptionTier.EXPLORER)
+    pages_processed_this_month = Column(Integer, default=0)
+    queries_this_month = Column(Integer, default=0)
+    last_usage_reset_date = Column(Date, default=date.today)

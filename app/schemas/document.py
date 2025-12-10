@@ -1,12 +1,20 @@
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
+import enum
+
+class DocumentStatus(str, enum.Enum):
+    UPLOADED = "uploaded"
+    PROCESSING = "processing"
+    READY = "ready"
+    FAILED = "failed"
 
 class DocumentBase(BaseModel):
     filename: str
     file_type: str
     size: int
     storage_provider: str
+    status: DocumentStatus = DocumentStatus.UPLOADED
 
 class DocumentCreate(DocumentBase):
     user_id: int
@@ -39,3 +47,8 @@ class QueryRequest(BaseModel):
 class QueryResponse(BaseModel):
     response: str
     sources: List[str]
+
+class TaskStatusResponse(BaseModel):
+    task_id: str
+    status: str
+    result: Optional[dict] = None

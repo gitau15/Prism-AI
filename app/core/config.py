@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Union, Dict, Any
 from pydantic_settings import BaseSettings
 from pydantic import AnyHttpUrl
 
@@ -24,10 +24,22 @@ class Settings(BaseSettings):
     GOOGLE_DRIVE_CLIENT_ID: str = ""
     GOOGLE_DRIVE_CLIENT_SECRET: str = ""
     
-    # Payment processing
+    # Payment processing - Daraja API
     DARAJA_CONSUMER_KEY: str = ""
     DARAJA_CONSUMER_SECRET: str = ""
     DARAJA_SHORTCODE: str = ""
+    DARAJA_PASSKEY: str = ""
+    DARAJA_CALLBACK_URL: str = ""
+    
+    # Celery settings
+    CELERY_BROKER_URL: str = "redis://localhost:6379/0"
+    CELERY_RESULT_BACKEND: str = "redis://localhost:6379/0"
+    
+    # Usage limits
+    USAGE_LIMITS: Dict[str, Dict[str, int]] = {
+        "EXPLORER": {"max_pages_per_month": 50, "max_queries_per_month": 100},
+        "PRO": {"max_pages_per_month": 500, "max_queries_per_month": 1000},
+    }
     
     class Config:
         case_sensitive = True

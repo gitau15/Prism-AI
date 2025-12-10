@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.database.session import get_db
 from app.schemas.document import QueryRequest, QueryResponse
 from app.models.document import Document
+from app.core.usage import check_usage_limits
 
 router = APIRouter()
 
@@ -16,6 +17,9 @@ def query_documents(request: QueryRequest, db: Session = Depends(get_db)):
     4. Send to LLM
     5. Return formatted response
     """
+    # Check usage limits for query processing
+    check_usage_limits(request.user_id, "query", db)
+    
     # Validate user has access to query
     user_docs = db.query(Document).filter(Document.user_id == request.user_id).all()
     if not user_docs:
