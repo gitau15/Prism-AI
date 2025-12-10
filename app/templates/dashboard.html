@@ -3,39 +3,50 @@
 {% block title %}Dashboard - Prism AI{% endblock %}
 
 {% block content %}
-<article>
-    <header>
-        <h1>Welcome, {{ user.email }}!</h1>
-        <p>Your Prism AI Dashboard</p>
-    </header>
-    
-    <section>
-        <h2>Quick Stats</h2>
-        <div class="grid">
-            <article>
-                <h3>Pages Processed</h3>
-                <p>{{ user.pages_processed_this_month }} / {{ "100" if user.subscription_tier == "EXPLORER" else "∞" }}</p>
-            </article>
-            <article>
-                <h3>Queries Made</h3>
-                <p>{{ user.queries_this_month }} / {{ "50" if user.subscription_tier == "EXPLORER" else "∞" }}</p>
-            </article>
-            <article>
-                <h3>Subscription</h3>
-                <p>{{ user.subscription_tier }}</p>
-            </article>
+<header>
+    <h1>Welcome back, {{ user.email }}!</h1>
+    <p>Your Prism AI Dashboard</p>
+</header>
+
+<section class="stats-grid">
+    <div class="stat-card">
+        <h3>Pages Processed</h3>
+        <div class="stat-number">{{ user.pages_processed_this_month }}</div>
+        <p>of {{ "100" if user.subscription_tier == "EXPLORER" else "∞" }} this month</p>
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: {{ (user.pages_processed_this_month / (100 if user.subscription_tier == 'EXPLORER' else 1000)) * 100 }}%"></div>
         </div>
-    </section>
+    </div>
     
-    <section>
-        <h2>Get Started</h2>
-        <div class="grid">
-            <a href="/documents" role="button">Manage Documents</a>
-            <a href="/query" role="button">Ask Prism</a>
-            {% if user.subscription_tier == "EXPLORER" %}
-            <a href="/upgrade" role="button" class="contrast">Upgrade to Pro</a>
-            {% endif %}
+    <div class="stat-card">
+        <h3>Queries Used</h3>
+        <div class="stat-number">{{ user.queries_this_month }}</div>
+        <p>of {{ "50" if user.subscription_tier == "EXPLORER" else "∞" }} this month</p>
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: {{ (user.queries_this_month / (50 if user.subscription_tier == 'EXPLORER' else 500)) * 100 }}%"></div>
         </div>
-    </section>
-</article>
+    </div>
+    
+    <div class="stat-card">
+        <h3>Subscription</h3>
+        <div class="stat-number">{{ user.subscription_tier }}</div>
+        <p>{% if user.subscription_tier == "EXPLORER" %}Free tier{% else %}Pro tier{% endif %}</p>
+    </div>
+</section>
+
+{% if user.subscription_tier == "EXPLORER" %}
+<section class="card" style="background-color: var(--lightest-blue); text-align: center;">
+    <h2>Unlock Unlimited Power</h2>
+    <p>Upgrade to Pro for unlimited document processing and queries</p>
+    <a href="/upgrade" role="button" class="contrast">Upgrade to Pro</a>
+</section>
+{% endif %}
+
+<section>
+    <h2>Get Started</h2>
+    <div class="grid">
+        <a href="/documents" role="button">Manage Documents</a>
+        <a href="/query" role="button">Ask Prism</a>
+    </div>
+</section>
 {% endblock %}

@@ -3,28 +3,27 @@
 {% block title %}Prism AI - Intelligent Document Query System{% endblock %}
 
 {% block content %}
-<article>
-    <header>
-        <h1>Welcome to Prism AI</h1>
-        <p>Your intelligent document analysis and query platform</p>
-    </header>
-    
-    <section>
-        <p>Prism AI transforms how you interact with your documents by leveraging advanced AI technologies:</p>
-        
-        <ul>
-            <li><strong>Smart Document Processing:</strong> Automatically parse and analyze PDFs, Word documents, and more</li>
-            <li><strong>Intelligent Query Engine:</strong> Ask natural language questions about your documents</li>
-            <li><strong>RAG Technology:</strong> Get accurate answers backed by your document content</li>
-            <li><strong>Secure & Private:</strong> Your documents are processed securely and never shared</li>
-        </ul>
-        
-        <p>Get started today and unlock the power of AI-driven document insights!</p>
-    </section>
-    
-    <footer>
-        <a href="/register" role="button">Sign Up Free</a>
-        <a href="/login" role="button" class="secondary">Log In</a>
-    </footer>
-</article>
+<section class="hero">
+    <h1>Stop Searching. Start Finding.</h1>
+    <p>Prism AI is your personal research assistant. Connect your documents and get instant, sourced answers.</p>
+    <a href="/register" role="button">Get Started Free</a>
+    <a href="/login" role="button" class="secondary">Log In</a>
+</section>
+
+<section class="features">
+    <div class="grid">
+        <div class="feature-card">
+            <h3>Smart Document Processing</h3>
+            <p>Automatically parse and analyze PDFs, Word documents, and more with our advanced AI technology.</p>
+        </div>
+        <div class="feature-card">
+            <h3>Intelligent Query Engine</h3>
+            <p>Ask natural language questions about your documents and get precise, contextual answers.</p>
+        </div>
+        <div class="feature-card">
+            <h3>RAG Technology</h3>
+            <p>Get accurate answers backed by your document content with Retrieval-Augmented Generation.</p>
+        </div>
+    </div>
+</section>
 {% endblock %}
