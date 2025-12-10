@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  prism-ai:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+      - ./chroma_db:/app/chroma_db
+    environment:
+      - DATABASE_URL=sqlite:///./data/prism_ai.db
+      - CHROMADB_PATH=/app/chroma_db
+    depends_on:
+      - chroma-db
+
+  chroma-db:
+    image: chromadb/chroma:latest
+    ports:
+      - "8001:8000"
+    volumes:
+      - chroma-data:/chroma/chroma/
+    environment:
+      - IS_PERSISTENT=true
+
+volumes:
+  chroma-data:
