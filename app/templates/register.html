@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up - Prism AI{% endblock %}
+
+{% block content %}
+<article>
+    <header>
+        <h1>Create a Prism AI Account</h1>
+        <p>Join thousands of users transforming how they work with documents</p>
+    </header>
+    
+    {% if error %}
+    <div class="alert alert-danger">
+        <p>{{ error }}</p>
+    </div>
+    {% endif %}
+    
+    <form action="/register" method="post">
+        <div>
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        
+        <div>
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        
+        <button type="submit">Sign Up</button>
+    </form>
+    
+    <p>Already have an account? <a href="/login">Log in here</a></p>
+</article>
+{% endblock %}

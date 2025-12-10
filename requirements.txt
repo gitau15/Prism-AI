@@ -17,3 +17,5 @@ google-generativeai>=0.3.0
 celery>=5.2.0
 redis>=4.0.0
 flower>=1.0.0
+jinja2>=3.0.0
+python-multipart>=0.0.5

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Prism AI{% endblock %}
+
+{% block content %}
+<article>
+    <header>
+        <h1>Welcome, {{ user.email }}!</h1>
+        <p>Your Prism AI Dashboard</p>
+    </header>
+    
+    <section>
+        <h2>Quick Stats</h2>
+        <div class="grid">
+            <article>
+                <h3>Pages Processed</h3>
+                <p>{{ user.pages_processed_this_month }} / {{ "100" if user.subscription_tier == "EXPLORER" else "∞" }}</p>
+            </article>
+            <article>
+                <h3>Queries Made</h3>
+                <p>{{ user.queries_this_month }} / {{ "50" if user.subscription_tier == "EXPLORER" else "∞" }}</p>
+            </article>
+            <article>
+                <h3>Subscription</h3>
+                <p>{{ user.subscription_tier }}</p>
+            </article>
+        </div>
+    </section>
+    
+    <section>
+        <h2>Get Started</h2>
+        <div class="grid">
+            <a href="/documents" role="button">Manage Documents</a>
+            <a href="/query" role="button">Ask Prism</a>
+            {% if user.subscription_tier == "EXPLORER" %}
+            <a href="/upgrade" role="button" class="contrast">Upgrade to Pro</a>
+            {% endif %}
+        </div>
+    </section>
+</article>
+{% endblock %}

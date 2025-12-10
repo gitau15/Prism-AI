@@ -1,8 +1,13 @@
 import sentry_sdk
 from sentry_sdk.integrations.fastapi import FastApiIntegration
 from sentry_sdk.integrations.starlette import StarletteIntegration
-from fastapi import FastAPI, Response, Request
+from fastapi import FastAPI, Response, Request, Depends, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.security import OAuth2PasswordRequestForm
+from starlette.middleware.sessions import SessionMiddleware
 from app.api.v1 import api_router
 from app.core.config import settings
 import logging
@@ -30,6 +35,15 @@ app = FastAPI(
     title=settings.PROJECT_NAME,
     openapi_url=f"{settings.API_V1_STR}/openapi.json"
 )
+
+# Mount static files
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
+
+# Set up Jinja2 templates
+templates = Jinja2Templates(directory="app/templates")
+
+# Add session middleware for authentication
+app.add_middleware(SessionMiddleware, secret_key="prism_ai_secret_key")
 
 # Middleware to collect metrics
 @app.middleware("http")
@@ -113,3 +127,140 @@ async def global_exception_handler(request: Request, exc: Exception):
     sentry_sdk.capture_exception(exc)
     logger.error(f"Global exception handler caught: {str(exc)}")
     return {"message": "Internal server error"}
+
+# HTML serving endpoints
+@app.get("/", response_class=HTMLResponse)
+async def read_root(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
+
+@app.get("/login", response_class=HTMLResponse)
+async def login_form(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request})
+
+@app.post("/login")
+async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends()):
+    # This is a simplified login flow for demonstration
+    # In a real implementation, you would verify credentials against your database
+    request.session['user'] = {"email": form_data.username}
+    return RedirectResponse(url="/dashboard", status_code=303)
+
+@app.get("/register", response_class=HTMLResponse)
+async def register_form(request: Request):
+    return templates.TemplateResponse("register.html", {"request": request})
+
+@app.post("/register")
+async def register(request: Request, email: str = Form(...), password: str = Form(...)):
+    # This is a simplified registration flow for demonstration
+    # In a real implementation, you would hash the password and store user in database
+    request.session['user'] = {"email": email}
+    return RedirectResponse(url="/dashboard", status_code=303)
+
+@app.get("/logout")
+async def logout(request: Request):
+    request.session.clear()
+    return RedirectResponse(url="/")
+
+@app.get("/dashboard", response_class=HTMLResponse)
+async def dashboard(request: Request):
+    user = request.session.get('user')
+    if not user:
+        return RedirectResponse(url="/login")
+    
+    # Mock user data for demonstration
+    user_data = {
+        "email": user["email"],
+        "pages_processed_this_month": 25,
+        "queries_this_month": 12,
+        "subscription_tier": "EXPLORER"
+    }
+    
+    return templates.TemplateResponse("dashboard.html", {"request": request, "user": user_data})
+
+@app.get("/documents", response_class=HTMLResponse)
+async def documents_page(request: Request):
+    user = request.session.get('user')
+    if not user:
+        return RedirectResponse(url="/login")
+    
+    # Mock documents data for demonstration
+    documents = [
+        {
+            "filename": "research_paper.pdf",
+            "file_type": "application/pdf",
+            "size": 1024000,
+            "processed": True,
+            "created_at": "2025-12-01 10:30:00"
+        },
+        {
+            "filename": "financial_report.docx",
+            "file_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "size": 512000,
+            "processed": False,
+            "created_at": "2025-12-05 14:15:00"
+        }
+    ]
+    
+    return templates.TemplateResponse("documents.html", {"request": request, "documents": documents})
+
+@app.post("/documents")
+async def upload_document(request: Request):
+    user = request.session.get('user')
+    if not user:
+        return RedirectResponse(url="/login")
+    
+    # In a real implementation, you would handle the file upload here
+    # and call your API endpoint for document processing
+    
+    return templates.TemplateResponse("documents.html", {
+        "request": request, 
+        "message": "Document uploaded successfully! Processing will begin shortly."
+    })
+
+@app.get("/query", response_class=HTMLResponse)
+async def query_page(request: Request):
+    user = request.session.get('user')
+    if not user:
+        return RedirectResponse(url="/login")
+    
+    return templates.TemplateResponse("query.html", {"request": request})
+
+@app.post("/query")
+async def query_documents(request: Request, question: str = Form(...)):
+    user = request.session.get('user')
+    if not user:
+        return RedirectResponse(url="/login")
+    
+    # Mock response for demonstration
+    # In a real implementation, you would call your API endpoint for querying
+    answer = {
+        "response": f"This is a simulated response to your question: '{question}'. In a full implementation, this would be answered using content from your documents.",
+        "sources": ["research_paper.pdf", "financial_report.docx"]
+    }
+    
+    return templates.TemplateResponse("query.html", {
+        "request": request, 
+        "question": question,
+        "answer": answer
+    })
+
+@app.get("/upgrade", response_class=HTMLResponse)
+async def upgrade_page(request: Request):
+    user = request.session.get('user')
+    if not user:
+        return RedirectResponse(url="/login")
+    
+    return templates.TemplateResponse("upgrade.html", {"request": request})
+
+@app.post("/upgrade")
+async def initiate_upgrade(request: Request, phone_number: str = Form(...)):
+    user = request.session.get('user')
+    if not user:
+        return RedirectResponse(url="/login")
+    
+    # In a real implementation, you would call your API endpoint for payment initiation
+    # and handle the response appropriately
+    
+    return templates.TemplateResponse("upgrade.html", {
+        "request": request,
+        "message": "Payment request sent successfully! Please check your phone for the M-Pesa prompt."
+    })

@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Ask Prism - Prism AI{% endblock %}
+
+{% block content %}
+<article>
+    <header>
+        <h1>Ask Prism</h1>
+        <p>Ask questions about your documents</p>
+    </header>
+    
+    <section>
+        <form action="/query" method="post" id="queryForm">
+            <div>
+                <label for="question">What would you like to know?</label>
+                <textarea id="question" name="question" rows="4" placeholder="e.g., What are the key findings in my research paper?" required>{{ question or '' }}</textarea>
+            </div>
+            
+            <button type="submit">Ask Prism</button>
+        </form>
+    </section>
+    
+    {% if answer %}
+    <section>
+        <h2>Answer</h2>
+        <article>
+            <p>{{ answer.response }}</p>
+            
+            {% if answer.sources %}
+            <hr>
+            <h3>Sources</h3>
+            <ul>
+                {% for source in answer.sources %}
+                <li>{{ source }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </article>
+    </section>
+    {% endif %}
+</article>
+
+<div id="loadingIndicator" style="display: none;">
+    <p>Thinking... This may take a moment.</p>
+</div>
+
+<script>
+    document.getElementById('queryForm').addEventListener('submit', function() {
+        document.querySelector('button[type="submit"]').disabled = true;
+        document.getElementById('loadingIndicator').style.display = 'block';
+    });
+</script>
+{% endblock %}

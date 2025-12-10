@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Documents - Prism AI{% endblock %}
+
+{% block content %}
+<article>
+    <header>
+        <h1>Your Documents</h1>
+        <p>Manage and process your documents</p>
+    </header>
+    
+    {% if message %}
+    <div class="alert alert-success">
+        <p>{{ message }}</p>
+    </div>
+    {% endif %}
+    
+    {% if error %}
+    <div class="alert alert-danger">
+        <p>{{ error }}</p>
+    </div>
+    {% endif %}
+    
+    <section>
+        <h2>Upload New Document</h2>
+        <form action="/documents" method="post" enctype="multipart/form-data">
+            <input type="file" name="file" required>
+            <button type="submit">Upload Document</button>
+        </form>
+    </section>
+    
+    <section>
+        <h2>Your Documents</h2>
+        {% if documents %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Filename</th>
+                    <th>Type</th>
+                    <th>Size</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for document in documents %}
+                <tr>
+                    <td>{{ document.filename }}</td>
+                    <td>{{ document.file_type }}</td>
+                    <td>{{ document.size }} bytes</td>
+                    <td>{{ "Processed" if document.processed else "Processing" }}</td>
+                    <td>{{ document.created_at.strftime("%Y-%m-%d %H:%M") }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>You haven't uploaded any documents yet.</p>
+        {% endif %}
+    </section>
+</article>
+
+<div id="loadingIndicator" style="display: none;">
+    <p>Processing your document... This may take a moment.</p>
+</div>
+
+<script>
+    document.querySelector('form').addEventListener('submit', function() {
+        document.querySelector('button[type="submit"]').disabled = true;
+        document.getElementById('loadingIndicator').style.display = 'block';
+    });
+</script>
+{% endblock %}
