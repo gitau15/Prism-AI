@@ -76,10 +76,6 @@ if settings.BACKEND_CORS_ORIGINS:
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
 
-@app.get("/")
-async def root():
-    return {"message": "Welcome to Prism AI - Intelligent Document Query System"}
-
 @app.get("/health")
 async def health_check():
     """
