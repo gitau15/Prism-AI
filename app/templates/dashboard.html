@@ -12,18 +12,18 @@
     <div class="stat-card">
         <h3>Pages Processed</h3>
         <div class="stat-number">{{ user.pages_processed_this_month }}</div>
-        <p>of {{ "100" if user.subscription_tier == "EXPLORER" else "∞" }} this month</p>
+        <p>of {{ user.pages_limit }} this month</p>
         <div class="progress-bar">
-            <div class="progress-fill" style="width: {{ (user.pages_processed_this_month / (100 if user.subscription_tier == 'EXPLORER' else 1000)) * 100 }}%"></div>
+            <div class="progress-fill {{ user.pages_progress_class }}"></div>
         </div>
     </div>
     
     <div class="stat-card">
         <h3>Queries Used</h3>
         <div class="stat-number">{{ user.queries_this_month }}</div>
-        <p>of {{ "50" if user.subscription_tier == "EXPLORER" else "∞" }} this month</p>
+        <p>of {{ user.queries_limit }} this month</p>
         <div class="progress-bar">
-            <div class="progress-fill" style="width: {{ (user.queries_this_month / (50 if user.subscription_tier == 'EXPLORER' else 500)) * 100 }}%"></div>
+            <div class="progress-fill {{ user.queries_progress_class }}"></div>
         </div>
     </div>
     

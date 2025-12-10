@@ -13,7 +13,7 @@ function hideLoading() {
     }
 }
 
-// Form submission handlers
+// Enhanced form submission handlers
 document.addEventListener('DOMContentLoaded', function() {
     // Handle form submissions with loading indicators
     const forms = document.querySelectorAll('form');
@@ -26,4 +26,22 @@ document.addEventListener('DOMContentLoaded', function() {
             showLoading();
         });
     });
+    
+    // Handle file upload area hover effect
+    const uploadArea = document.querySelector('.upload-area');
+    if (uploadArea) {
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.style.borderColor = 'var(--hover-blue)';
+        });
+        
+        uploadArea.addEventListener('dragleave', function() {
+            this.style.borderColor = 'var(--light-blue)';
+        });
+        
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.style.borderColor = 'var(--light-blue)';
+        });
+    }
 });

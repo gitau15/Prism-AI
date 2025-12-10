@@ -12,6 +12,7 @@ from app.api.v1 import api_router
 from app.core.config import settings
 import logging
 from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
+from datetime import datetime
 
 # Initialize Sentry
 sentry_sdk.init(
@@ -127,11 +128,11 @@ async def global_exception_handler(request: Request, exc: Exception):
 # HTML serving endpoints
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse("index.html", {"request": request}, headers={"Content-Type": "text/html"})
 
 @app.get("/login", response_class=HTMLResponse)
 async def login_form(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request})
+    return templates.TemplateResponse("login.html", {"request": request}, headers={"Content-Type": "text/html"})
 
 @app.post("/login")
 async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends()):
@@ -142,7 +143,7 @@ async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends
 
 @app.get("/register", response_class=HTMLResponse)
 async def register_form(request: Request):
-    return templates.TemplateResponse("register.html", {"request": request})
+    return templates.TemplateResponse("register.html", {"request": request}, headers={"Content-Type": "text/html"})
 
 @app.post("/register")
 async def register(request: Request, email: str = Form(...), password: str = Form(...)):
@@ -163,14 +164,28 @@ async def dashboard(request: Request):
         return RedirectResponse(url="/login")
     
     # Mock user data for demonstration
+    pages_limit = 100 if user.get("subscription_tier", "EXPLORER") == "EXPLORER" else 1000
+    queries_limit = 50 if user.get("subscription_tier", "EXPLORER") == "EXPLORER" else 500
+    
+    pages_progress = (user.get("pages_processed_this_month", 25) / pages_limit) * 100
+    queries_progress = (user.get("queries_this_month", 12) / queries_limit) * 100
+    
+    # Convert progress to nearest 10% increment for CSS classes
+    pages_progress_class = f"progress-{round(min(pages_progress, 100) / 10) * 10}"
+    queries_progress_class = f"progress-{round(min(queries_progress, 100) / 10) * 10}"
+    
     user_data = {
         "email": user["email"],
-        "pages_processed_this_month": 25,
-        "queries_this_month": 12,
-        "subscription_tier": "EXPLORER"
+        "pages_processed_this_month": user.get("pages_processed_this_month", 25),
+        "queries_this_month": user.get("queries_this_month", 12),
+        "subscription_tier": user.get("subscription_tier", "EXPLORER"),
+        "pages_progress_class": pages_progress_class,
+        "queries_progress_class": queries_progress_class,
+        "pages_limit": "100" if user.get("subscription_tier", "EXPLORER") == "EXPLORER" else "∞",
+        "queries_limit": "50" if user.get("subscription_tier", "EXPLORER") == "EXPLORER" else "∞"
     }
     
-    return templates.TemplateResponse("dashboard.html", {"request": request, "user": user_data})
+    return templates.TemplateResponse("dashboard.html", {"request": request, "user": user_data}, headers={"Content-Type": "text/html"})
 
 @app.get("/documents", response_class=HTMLResponse)
 async def documents_page(request: Request):
@@ -185,18 +200,18 @@ async def documents_page(request: Request):
             "file_type": "application/pdf",
             "size": 1024000,
             "processed": True,
-            "created_at": "2025-12-01 10:30:00"
+            "created_at": datetime(2025, 12, 1, 10, 30, 0)
         },
         {
             "filename": "financial_report.docx",
             "file_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
             "size": 512000,
             "processed": False,
-            "created_at": "2025-12-05 14:15:00"
+            "created_at": datetime(2025, 12, 5, 14, 15, 0)
         }
     ]
     
-    return templates.TemplateResponse("documents.html", {"request": request, "documents": documents})
+    return templates.TemplateResponse("documents.html", {"request": request, "documents": documents}, headers={"Content-Type": "text/html"})
 
 @app.post("/documents")
 async def upload_document(request: Request):
@@ -210,7 +225,7 @@ async def upload_document(request: Request):
     return templates.TemplateResponse("documents.html", {
         "request": request, 
         "message": "Document uploaded successfully! Processing will begin shortly."
-    })
+    }, headers={"Content-Type": "text/html"})
 
 @app.get("/query", response_class=HTMLResponse)
 async def query_page(request: Request):
@@ -218,7 +233,7 @@ async def query_page(request: Request):
     if not user:
         return RedirectResponse(url="/login")
     
-    return templates.TemplateResponse("query.html", {"request": request})
+    return templates.TemplateResponse("query.html", {"request": request}, headers={"Content-Type": "text/html"})
 
 @app.post("/query")
 async def query_documents(request: Request, question: str = Form(...)):
@@ -237,7 +252,7 @@ async def query_documents(request: Request, question: str = Form(...)):
         "request": request, 
         "question": question,
         "answer": answer
-    })
+    }, headers={"Content-Type": "text/html"})
 
 @app.get("/upgrade", response_class=HTMLResponse)
 async def upgrade_page(request: Request):
@@ -245,7 +260,7 @@ async def upgrade_page(request: Request):
     if not user:
         return RedirectResponse(url="/login")
     
-    return templates.TemplateResponse("upgrade.html", {"request": request})
+    return templates.TemplateResponse("upgrade.html", {"request": request}, headers={"Content-Type": "text/html"})
 
 @app.post("/upgrade")
 async def initiate_upgrade(request: Request, phone_number: str = Form(...)):
@@ -259,4 +274,4 @@ async def initiate_upgrade(request: Request, phone_number: str = Form(...)):
     return templates.TemplateResponse("upgrade.html", {
         "request": request,
         "message": "Payment request sent successfully! Please check your phone for the M-Pesa prompt."
-    })
+    }, headers={"Content-Type": "text/html"})
